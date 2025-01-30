@@ -2,16 +2,16 @@
 
 const INITIAL_SCORE = 0;
 const INITIAL_STATE = [
-  [0, 0, 0, 0],
-  [0, 0, 0, 0],
-  [0, 0, 0, 0],
-  [0, 0, 0, 0],
+  [0,0,0,0],
+  [0,0,0,0],
+  [0,0,0,0],
+  [0,0,0,0],
 ];
 
-const STATUS_IDLE = 'idle';
-const STATUS_PLAYING = 'playing';
-const STATUS_WIN = 'win';
-const STATUS_LOSE = 'lose';
+const STATUS_IDLE = "idle";
+const STATUS_PLAYING = "playing";
+const STATUS_WIN = "win";
+const STATUS_LOSE = "lose";
 
 const FOUR_PROBABILITY = 0.1;
 
@@ -78,8 +78,10 @@ class Game {
         if (
           (this.state[row + 1] &&
             this.state[row][column] === this.state[row + 1][column]) ||
+          this.state[row][column] === 0 ||
           (this.state[row][column + 1] &&
-            this.state[row][column] === this.state[row][column + 1])
+            (this.state[row][column] === this.state[row][column + 1] ||
+              this.state[row][column] === 0))
         ) {
           hasAvailableMoves = true;
         }
@@ -223,7 +225,7 @@ class Game {
   }
 
   #moveWithOffset(offsetColumn, offsetRow = 0) {
-    if (this.status !== 'playing' && this.status !== 'idle') {
+    if (this.status !== "playing" && this.status !== "idle") {
       return;
     }
 
@@ -234,8 +236,6 @@ class Game {
     } else {
       this.#moveColumnWithOffset(offsetColumn);
     }
-
-    this.#checkGameBoard();
 
     if (lastState === this.state.toString()) {
       return;
@@ -269,6 +269,13 @@ class Game {
    */
   getState() {
     return this.state;
+  }
+
+  /**
+   * Update game status
+   */
+  updateStatus() {
+    this.#checkGameBoard();
   }
 
   /**

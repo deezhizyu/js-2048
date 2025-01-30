@@ -1,20 +1,20 @@
-'use strict';
+"use strict";
 
-const Game = require('../modules/Game.class');
+const Game = require("../modules/Game.class");
 const game = new Game();
 
-const rows = document.querySelectorAll('.field-row');
-const button = document.querySelector('.button');
-const gameScore = document.querySelector('.game-score');
+const rows = document.querySelectorAll(".field-row");
+const button = document.querySelector(".button");
+const gameScore = document.querySelector(".game-score");
 
-const messageStart = document.querySelector('.message-start');
-const messageWin = document.querySelector('.message-win');
-const messageLose = document.querySelector('.message-lose');
+const messageStart = document.querySelector(".message-start");
+const messageWin = document.querySelector(".message-win");
+const messageLose = document.querySelector(".message-lose");
 
-const BUTTON_RESTART = 'Restart';
-const BUTTON_CLASS_RESTART = 'restart';
-const BUTTON_START = 'Start';
-const BUTTON_CLASS_START = 'start';
+const BUTTON_RESTART = "Restart";
+const BUTTON_CLASS_RESTART = "restart";
+const BUTTON_START = "Start";
+const BUTTON_CLASS_START = "start";
 
 let showStartButton = true;
 
@@ -30,32 +30,34 @@ function update() {
         continue;
       }
 
-      const newCell = document.createElement('div');
+      const newCell = document.createElement("div");
 
       newCell.textContent = value;
-      newCell.classList.add('field-cell', `field-cell--${value}`);
+      newCell.classList.add("field-cell", `field-cell--${value}`);
 
       rows[row].children[column].replaceChildren(newCell);
     }
   }
 
+  game.updateStatus();
+
   switch (game.getStatus()) {
-    case 'playing':
+    case "playing":
       button.textContent = BUTTON_RESTART;
       button.classList.remove(BUTTON_CLASS_START);
       button.classList.add(BUTTON_CLASS_RESTART);
 
-      messageStart.classList.add('hidden');
-      messageWin.classList.add('hidden');
-      messageLose.classList.add('hidden');
+      messageStart.classList.add("hidden");
+      messageWin.classList.add("hidden");
+      messageLose.classList.add("hidden");
 
       break;
-    case 'lose':
-      messageLose.classList.remove('hidden');
+    case "lose":
+      messageLose.classList.remove("hidden");
 
       break;
-    case 'win':
-      messageWin.classList.remove('hidden');
+    case "win":
+      messageWin.classList.remove("hidden");
 
       break;
     default:
@@ -71,38 +73,38 @@ function update() {
   gameScore.textContent = game.getScore();
 }
 
-button.addEventListener('click', () => {
+button.addEventListener("click", () => {
   if (
-    game.getStatus() === 'playing' &&
+    game.getStatus() === "playing" &&
     !showStartButton &&
-    confirm('Are you sure you want to restart the game?')
+    confirm("Are you sure you want to restart the game?")
   ) {
     game.restart();
-  } else if (game.getStatus() !== 'playing') {
+  } else if (game.getStatus() !== "playing") {
     game.start();
   }
 
   update();
 });
 
-document.addEventListener('keydown', (e) => {
-  if (game.getStatus() !== 'playing') {
+document.addEventListener("keydown", (e) => {
+  if (game.getStatus() !== "playing") {
     return;
   }
 
   let pressedArrows = true;
 
   switch (e.key) {
-    case 'ArrowUp':
+    case "ArrowUp":
       game.moveUp();
       break;
-    case 'ArrowDown':
+    case "ArrowDown":
       game.moveDown();
       break;
-    case 'ArrowLeft':
+    case "ArrowLeft":
       game.moveLeft();
       break;
-    case 'ArrowRight':
+    case "ArrowRight":
       game.moveRight();
       break;
     default:
@@ -115,8 +117,8 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-document.addEventListener('touchstart', handleTouchStart, false);
-document.addEventListener('touchmove', handleTouchMove, false);
+document.addEventListener("touchstart", handleTouchStart, false);
+document.addEventListener("touchmove", handleTouchMove, false);
 
 let xDown = null;
 let yDown = null;
