@@ -104,11 +104,11 @@ function update() {
     return;
   }
 
-  console.log("update");
-
-  const state = game.getState();
+  cancelAllAnimations();
 
   cellsContainer.replaceChildren();
+
+  const state = game.getState();
 
   for (let row = 0; row < state.length; row++) {
     for (let column = 0; column < state[row].length; column++) {
@@ -249,6 +249,12 @@ function update() {
 
   game.updateStatus();
 
+  if (!gameScore) {
+    return;
+  }
+
+  gameScore.textContent = `${game.getScore()}`;
+
   if (!button || !messageStart || !messageWin || !messageLose) {
     return;
   }
@@ -281,12 +287,6 @@ function update() {
     button.classList.remove(BUTTON_CLASS_RESTART);
     button.classList.add(BUTTON_CLASS_START);
   }
-
-  if (!gameScore) {
-    return;
-  }
-
-  gameScore.textContent = `${game.getScore()}`;
 }
 
 if (button) {
@@ -337,10 +337,7 @@ document.addEventListener("keydown", (e) => {
 
   if (pressedArrows) {
     arrowsTimeout = true;
-
     showStartButton = false;
-
-    cancelAllAnimations();
 
     update();
 
@@ -396,6 +393,8 @@ function handleTouchMove(evt) {
       game.moveDown();
     }
   }
+
+  showStartButton = false;
 
   update();
 
