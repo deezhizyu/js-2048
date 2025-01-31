@@ -220,10 +220,10 @@ function update() {
           },
         ];
 
-        const animation = cellElement.animate(appearKeyframes, {
-          ...ANIMATION_TIMING,
-          delay: 300,
-        });
+        const animation = cellElement.animate(
+          appearKeyframes,
+          ANIMATION_TIMING,
+        );
 
         const resetCellState = () => {
           cellElement.style.scale = `1`;
