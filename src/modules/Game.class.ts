@@ -118,6 +118,7 @@ export class Game {
 
     this.state[randomEmptyCell[0]][randomEmptyCell[1]] = new Cell(
       Math.random() <= FOUR_PROBABILITY ? 4 : 2,
+      true,
     );
   }
 
@@ -259,12 +260,15 @@ export class Game {
   moveLeft() {
     this.moveWithOffset(1);
   }
+
   moveRight() {
     this.moveWithOffset(-1);
   }
+
   moveUp() {
     this.moveWithOffset(0, 1);
   }
+
   moveDown() {
     this.moveWithOffset(0, -1);
   }

@@ -6,12 +6,19 @@ export class Cell {
   otherCellRow: number | null;
   otherCellColumn: number | null;
   prevValue: number | null;
+  isNew: boolean;
 
-  constructor(value: number) {
+  constructor(value: number, isNew?: boolean) {
     this.value = value;
+
+    this.isNew = isNew || false;
 
     this.clearPreviousPosition();
     this.clearShouldMerge();
+  }
+
+  removeIsNew() {
+    this.isNew = false;
   }
 
   setShouldMerge(otherCellRow, otherCellColumn) {

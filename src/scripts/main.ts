@@ -20,6 +20,13 @@ const BUTTON_CLASS_START = "start";
 
 let showStartButton = true;
 
+const ANIMATION_TIMING: KeyframeAnimationOptions = {
+  duration: 300,
+  iterations: 1,
+  easing: "ease-in-out",
+  fill: "forwards",
+};
+
 function createCell(value) {
   if (!cellsContainer) {
     return;
@@ -33,6 +40,62 @@ function createCell(value) {
   cellsContainer.appendChild(cellElement);
 
   return cellElement;
+}
+
+function getCellRect(row: number, column: number) {
+  return rows[row].children[column].getBoundingClientRect();
+}
+
+function calculateCellKeyframes(
+  currentRow: number,
+  currentColumn: number,
+  targetRow: number,
+  targetColumn: number,
+  isMerging: boolean,
+  isMergable: boolean,
+) {
+  if (!cellsContainer) {
+    return;
+  }
+
+  const cellContainerRect = cellsContainer.getBoundingClientRect();
+
+  const previousCellRect = getCellRect(currentRow, currentColumn);
+  const currentCellRect = getCellRect(targetRow, targetColumn);
+
+  const keyframes = [
+    {
+      top: `${previousCellRect.top - cellContainerRect.top}px`,
+
+      left: `${previousCellRect.left - cellContainerRect.left}px`,
+      transform: "scale(1)",
+    },
+    {
+      transform: isMerging && !isMergable ? "scale(0.8)" : "scale(1)",
+    },
+    {
+      offset: 0.99,
+      transform: isMerging && isMergable ? "scale(1.2)" : "scale(1)",
+    },
+    {
+      top: `${currentCellRect.top - cellContainerRect.top}px`,
+
+      left: `${currentCellRect.left - cellContainerRect.left}px`,
+      transform: "scale(1)",
+    },
+  ];
+
+  return keyframes;
+}
+
+function cancelAllAnimations() {
+  if (!cellsContainer) {
+    return;
+  }
+
+  for (const child of cellsContainer.children) {
+    child.getAnimations().forEach((animation) => animation.cancel());
+  }
 }
 
 function update() {
@@ -61,31 +124,18 @@ function update() {
       }
 
       if (cell.prevColumn !== null && cell.prevRow !== null) {
-        const prevCellRect =
-          rows[cell.prevRow].children[cell.prevColumn].getBoundingClientRect();
-        const currentCellRect =
-          rows[row].children[column].getBoundingClientRect();
-        const cellContainerRect = cellsContainer.getBoundingClientRect();
+        const cellKeyframes = calculateCellKeyframes(
+          cell.prevRow,
+          cell.prevColumn,
+          row,
+          column,
+          cell.shouldMerge,
+          false,
+        );
 
-        const keyframes = [
-          {
-            top: `${prevCellRect.top - cellContainerRect.top}px`,
-
-            left: `${prevCellRect.left - cellContainerRect.left}px`,
-          },
-
-          {
-            top: `${currentCellRect.top - cellContainerRect.top}px`,
-
-            left: `${currentCellRect.left - cellContainerRect.left}px`,
-          },
-        ];
-
-        const timing = {
-          duration: 300,
-          iterations: 1,
-          easing: "ease-in-out",
-        };
+        if (!cellKeyframes) {
+          return;
+        }
 
         if (cell.shouldMerge) {
           if (cell.otherCellRow === null || cell.otherCellColumn === null) {
@@ -100,36 +150,43 @@ function update() {
             return;
           }
 
-          const prevCellRect2 =
-            rows[cell.otherCellRow].children[
-              cell.otherCellColumn
-            ].getBoundingClientRect();
+          const mergableCellKeyframes = calculateCellKeyframes(
+            cell.otherCellRow,
+            cell.otherCellColumn,
+            row,
+            column,
+            cell.shouldMerge,
+            true,
+          );
 
-          const keyframes2 = [
-            {
-              top: `${prevCellRect2.top - cellContainerRect.top}px`,
+          if (!mergableCellKeyframes) {
+            return;
+          }
 
-              left: `${prevCellRect2.left - cellContainerRect.left}px`,
-            },
+          const mergableCellAnimation = mergableCellElement.animate(
+            mergableCellKeyframes,
+            ANIMATION_TIMING,
+          );
 
-            {
-              top: `${currentCellRect.top - cellContainerRect.top}px`,
-
-              left: `${currentCellRect.left - cellContainerRect.left}px`,
-            },
-          ];
-
-          const animation2 = mergableCellElement.animate(keyframes2, timing);
-
-          animation2.addEventListener("finish", () => {
+          const handleMergeAnimationEnd = () => {
             cell.clearShouldMerge();
             mergableCellElement.remove();
-          });
+          };
+
+          mergableCellAnimation.addEventListener(
+            "finish",
+            handleMergeAnimationEnd,
+          );
+          mergableCellAnimation.addEventListener(
+            "cancel",
+            handleMergeAnimationEnd,
+          );
         }
 
-        const animation = cellElement.animate(keyframes, timing);
+        const animation = cellElement.animate(cellKeyframes, ANIMATION_TIMING);
 
-        animation.addEventListener("finish", () => {
+        const handleAnimationEnd = () => {
+          console.log("cancelled");
           cell.clearPreviousPosition();
 
           cellElement.classList.remove(`cell--${cellElement.textContent}`);
@@ -137,30 +194,49 @@ function update() {
           cellElement.textContent = `${cell.value}`;
 
           cellElement.classList.add(`cell--${cellElement.textContent}`);
+        };
 
-          cellElement.style.top = `${
-            currentCellRect.top - cellContainerRect.top
-          }px`;
-          cellElement.style.left = `${
-            currentCellRect.left - cellContainerRect.left
-          }px`;
-        });
-      } else {
-        cellElement.style.top = `${
-          rows[row].children[column].getBoundingClientRect().top -
-          cellsContainer.getBoundingClientRect().top
-        }px`;
+        animation.addEventListener("finish", handleAnimationEnd);
+        animation.addEventListener("cancel", handleAnimationEnd);
 
-        cellElement.style.left = `${
-          rows[row].children[column].getBoundingClientRect().left -
-          cellsContainer.getBoundingClientRect().left
-        }px`;
-      }
-
-      if (cell.value < 2 || cell.value % 2 !== 0) {
-        rows[row].children[column].replaceChildren();
         continue;
       }
+
+      if (cell.isNew) {
+        const appearKeyframes = [
+          {
+            transform: "scale(0)",
+          },
+          {
+            transform: "scale(1.2)",
+          },
+          {
+            transform: "scale(1)",
+          },
+        ];
+
+        const animation = cellElement.animate(
+          appearKeyframes,
+          ANIMATION_TIMING,
+        );
+
+        const resetCellState = () => {
+          cell.removeIsNew();
+        };
+
+        animation.addEventListener("finish", resetCellState);
+        animation.addEventListener("cancel", resetCellState);
+      }
+
+      cellElement.style.top = `${
+        rows[row].children[column].getBoundingClientRect().top -
+        cellsContainer.getBoundingClientRect().top
+      }px`;
+
+      cellElement.style.left = `${
+        rows[row].children[column].getBoundingClientRect().left -
+        cellsContainer.getBoundingClientRect().left
+      }px`;
     }
   }
 
@@ -222,8 +298,14 @@ if (button) {
   });
 }
 
+let arrowsTimeout = false;
+
 document.addEventListener("keydown", (e) => {
   if (game.getStatus() !== Status.playing) {
+    return;
+  }
+
+  if (arrowsTimeout) {
     return;
   }
 
@@ -247,8 +329,17 @@ document.addEventListener("keydown", (e) => {
   }
 
   if (pressedArrows) {
+    arrowsTimeout = true;
+
     showStartButton = false;
+
+    cancelAllAnimations();
+
     update();
+
+    setTimeout(() => {
+      arrowsTimeout = false;
+    }, 50);
   }
 });
 
