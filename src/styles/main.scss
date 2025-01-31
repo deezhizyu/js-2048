@@ -11,6 +11,19 @@ body {
 }
 
 .field-cell {
+  background: #d6cdc4;
+  width: 75px;
+  height: 75px;
+  border-radius: 5px;
+  color: #776e65;
+  box-sizing: border-box;
+  user-select: none;
+}
+
+.cell {
+  position: absolute;
+  z-index: 1;
+
   display: flex;
   align-items: center;
   justify-content: center;
@@ -77,12 +90,18 @@ body {
   }
 }
 
+.cells-container {
+  position: absolute;
+}
+
 .field-row {
   display: flex;
   gap: 10px;
 }
 
 .game-field {
+  position: relative;
+
   padding: 10px;
 
   display: flex;
