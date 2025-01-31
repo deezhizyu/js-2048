@@ -63,24 +63,21 @@ export class Game {
 
         let hasMovesVertically = false;
 
-        if (this.state[row + 1]) {
-          const canMergeVertically =
-            this.state[row][column].value === this.state[row + 1][column].value;
-          const canMoveVertically = this.state[row][column].value === 0;
+        const canMergeVertically =
+          !!this.state[row + 1] &&
+          this.state[row][column].value === this.state[row + 1][column].value;
+        const canMoveVertically = this.state[row][column].value === 0;
 
-          hasMovesVertically = canMergeVertically || canMoveVertically;
-        }
+        hasMovesVertically = canMergeVertically || canMoveVertically;
 
         let hasMoveHorizonally = false;
 
-        if (this.state[row][column + 1]) {
-          const canMergeHorizontally =
-            this.state[row][column].value === this.state[row][column + 1].value;
+        const canMergeHorizontally =
+          !!this.state[row][column + 1] &&
+          this.state[row][column].value === this.state[row][column + 1].value;
+        const canMoveHorizontally = this.state[row][column].value === 0;
 
-          const canMoveHorizontally = this.state[row][column].value === 0;
-
-          hasMoveHorizonally = canMergeHorizontally || canMoveHorizontally;
-        }
+        hasMoveHorizonally = canMergeHorizontally || canMoveHorizontally;
 
         if (hasMovesVertically || hasMoveHorizonally) {
           hasAvailableMoves = true;
