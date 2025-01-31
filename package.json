@@ -6,7 +6,6 @@
     "init": "mate-scripts init",
     "lint": "mate-scripts lint",
     "test:only": "mate-scripts test",
-    "postinstall": "npm run update",
     "start": "vite",
     "build": "vite build",
     "predeploy": "npm run build",
