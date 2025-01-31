@@ -1,0 +1,15 @@
+@mixin adapt-phone {
+  @media (max-width: 400px) {
+    @content;
+  }
+}
+
+@mixin square-size {
+  width: 75px;
+  height: 75px;
+
+  @include adapt-phone {
+    width: 60px;
+    height: 60px;
+  }
+}

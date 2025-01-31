@@ -1,23 +1,35 @@
+@use "./mixins.scss";
+
 body {
+  min-height: 100vh;
   margin: 0;
+
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 100vh;
-  background: #fbf8ef;
+
   font-family: sans-serif;
   font-size: 24px;
   font-weight: 900;
+
+  background: #fbf8ef;
+
+  overflow: hidden;
+
+  @include mixins.adapt-phone {
+    font-size: 20px;
+  }
 }
 
 .field-cell {
   background: #d6cdc4;
-  width: 75px;
-  height: 75px;
+
   border-radius: 5px;
   color: #776e65;
   box-sizing: border-box;
   user-select: none;
+
+  @include mixins.square-size;
 }
 
 .cell {
@@ -29,12 +41,13 @@ body {
   justify-content: center;
 
   background: #d6cdc4;
-  width: 75px;
-  height: 75px;
+
   border-radius: 5px;
-  color: #776e65;
   box-sizing: border-box;
+  color: #776e65;
   user-select: none;
+
+  @include mixins.square-size;
 
   &--2 {
     background: #eee4da;
@@ -100,6 +113,8 @@ body {
 }
 
 .game-field {
+  touch-action: none;
+
   position: relative;
 
   padding: 10px;
@@ -124,31 +139,38 @@ body {
 
 h1 {
   background: #edc22e;
-  color: #f9f6f2;
-  width: 75px;
-  height: 75px;
-  font-size: 24px;
-  border-radius: 5px;
+
   display: flex;
   align-items: center;
   justify-content: center;
-  box-sizing: border-box;
+
   margin: 0;
+  box-sizing: border-box;
+
+  font-size: 24px;
+  border-radius: 5px;
+
+  color: #f9f6f2;
+
+  @include mixins.square-size;
 }
 
 .info {
+  background: #d6cdc4;
+
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: #d6cdc4;
-  width: 75px;
-  height: 75px;
-  border-radius: 5px;
-  color: #776e65;
-  box-sizing: border-box;
-  font-size: 16px;
+
   margin: 0 8px 0 0;
+  box-sizing: border-box;
+
+  border-radius: 5px;
+  font-size: 16px;
+  color: #776e65;
+
+  @include mixins.square-size;
 }
 
 .controls {
@@ -156,17 +178,24 @@ h1 {
 }
 
 .button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
   border: none;
   border-radius: 5px;
-  cursor: pointer;
-  color: #f9f6f2;
+
   font-family: sans-serif;
   font-weight: 700;
   font-size: 16px;
-  width: 75px;
-  height: 75px;
+
+  color: #f9f6f2;
+
+  cursor: pointer;
 
   transition: 0.25s ease background;
+
+  @include mixins.square-size;
 }
 
 .start {
@@ -205,7 +234,7 @@ h1 {
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 350px;
+  width: min-content;
 }
 
 .message-win {
@@ -215,5 +244,5 @@ h1 {
 
 .message-container {
   width: 100%;
-  height: 150px;
+  height: fit-content;
 }

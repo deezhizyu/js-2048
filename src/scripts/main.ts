@@ -4,6 +4,7 @@ import { Game, Status } from "../modules/Game.class";
 
 const game = new Game();
 
+const gameField = document.querySelector(".game-field");
 const cellsContainer = document.querySelector(".cells-container");
 const rows = document.querySelectorAll(".field-row");
 const button = document.querySelector(".button");
@@ -74,7 +75,7 @@ function calculateCellKeyframes(
       transform: isMerging && !isMergable ? "scale(0.8)" : "scale(1)",
     },
     {
-      offset: 0.99,
+      offset: 0.85,
       transform: isMerging && isMergable ? "scale(1.2)" : "scale(1)",
     },
     {
@@ -102,6 +103,8 @@ function update() {
   if (!cellsContainer) {
     return;
   }
+
+  console.log("update");
 
   const state = game.getState();
 
@@ -203,24 +206,28 @@ function update() {
       }
 
       if (cell.isNew) {
+        cellElement.style.scale = `0`;
+
         const appearKeyframes = [
           {
-            transform: "scale(0)",
+            scale: "0",
           },
           {
-            transform: "scale(1.2)",
+            scale: "1.2",
           },
           {
-            transform: "scale(1)",
+            scale: "1",
           },
         ];
 
-        const animation = cellElement.animate(
-          appearKeyframes,
-          ANIMATION_TIMING,
-        );
+        const animation = cellElement.animate(appearKeyframes, {
+          ...ANIMATION_TIMING,
+          delay: 300,
+        });
 
         const resetCellState = () => {
+          cellElement.style.scale = `1`;
+
           cell.removeIsNew();
         };
 
@@ -343,8 +350,10 @@ document.addEventListener("keydown", (e) => {
   }
 });
 
-document.addEventListener("touchstart", handleTouchStart, false);
-document.addEventListener("touchmove", handleTouchMove, false);
+if (gameField) {
+  gameField.addEventListener("touchstart", handleTouchStart, false);
+  gameField.addEventListener("touchmove", handleTouchMove, false);
+}
 
 let xDown = null;
 let yDown = null;
@@ -392,4 +401,12 @@ function handleTouchMove(evt) {
 
   xDown = null;
   yDown = null;
+}
+
+if (gameField) {
+  const resizeObserver = new window.ResizeObserver(() => {
+    update();
+  });
+
+  resizeObserver.observe(gameField);
 }
